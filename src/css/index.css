@@ -3,3 +3,60 @@
     padding: 0;
     color: #000;
 }
+.video{
+    width: 700px;
+    height: 480px;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    position: relative;
+    margin: 10px auto;
+}
+.l-video{
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+}
+.video .l-title{
+    width: 100%;
+    box-sizing: border-box;
+    padding: 20px 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background:linear-gradient(to bottom, rgba(43,51,63,.7), rgba(0,0,0,0.3));
+    z-index: 9;
+}
+.video .l-title p{
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+    overflow: hidden;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
+.video .l-c-controlsBar{
+    width: 100%;
+    padding: 20px 10px;
+    box-sizing: border-box;
+    background:linear-gradient(to top, rgba(43,51,63,.7), rgba(0,0,0,0.3));
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 9;
+}
+.video .l-c-controlsBar .l-c-playCon{
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    background:#fff;
+    border-radius: 100%;
+    cursor: pointer;
+    user-select: none;
+}
+.video .l-c-controlsBar .l-c-playCon p{
+    color: #000;
+    font-size: 12px;
+}

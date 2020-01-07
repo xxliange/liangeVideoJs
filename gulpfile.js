@@ -63,7 +63,7 @@ gulp.task('script', async()=>{
 
 gulp.task('default', gulp.parallel(['script', 'css'], ()=>{
     gulp.watch('./src/js/**/*.js', gulp.series('script'));
-    gulp.watch('./src/css/**/*.js', gulp.parallel('css', 'script'));
+    gulp.watch('./src/css/**/*.css', gulp.parallel('css', 'script'));
 }));
 
 gulp.task('build', gulp.parallel(['script', 'css']));

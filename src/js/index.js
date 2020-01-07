@@ -1,3 +1,5 @@
+import Video from './core/index';
+
 try {
     document;
 } catch (error) {
@@ -10,3 +12,4 @@ style.type = 'text/css';
 style.innerHTML = inlineCss;
 document.getElementsByTagName('HEAD').item(0).appendChild(style);
 
+export default (window.liangeVideoJs || Video);

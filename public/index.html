@@ -7,7 +7,17 @@
     <title>liangeVideoJs</title>
 </head>
 <body>
-    
+    <div id='video' class="video">
+    </div>
 </body>
 </html>
 <script src="./../build/liangeVideoJs.js"></script>
+<script>
+    const el = document.getElementById('video');
+    const video = new liangeVideoJs('#video', {
+        url:'https://m.muho.tv/bXVob1RW_1568709109.mp4',
+        title:'幕后篮球幕后篮球幕后篮球幕后篮球幕后篮球幕后篮球幕后篮球幕后篮球幕后篮球幕后篮球幕后篮球幕后篮球'
+    });
+    video.create();
+
+</script>
