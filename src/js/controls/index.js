@@ -45,10 +45,21 @@ Controls.prototype = {
         const video = this.video;
         const $videoControls = video.$controlsBar;
         const controls = this.controls;
+        const $controlsMain = $(`<div></div>`);
+        const $controlsProgress = $('<div></div>')
+        $videoControls.append($controlsProgress);
+        $videoControls.append($controlsMain);
+        $controlsProgress.addClass('l-c-controlsProgress');
+        $controlsMain.addClass('l-c-controlsMain');
         objForEach(controls, (key, control)=>{
             const $elem = control.$elem;
             if($elem){
-                $videoControls.append($elem);
+                $controlsProgress.append($elem);
+            }
+            if(key === 'progressBar'){
+
+            }else{
+                $controlsMain.append($elem);
             }
         })
     },

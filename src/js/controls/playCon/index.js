@@ -8,17 +8,20 @@
 //  构造函数
 function PlayCon(video){
     this.video = video;
-    this.text = '播放';
     this.$elem = $(`
         <div class='l-c-playCon'>
 
         </div>
     `);
-    this.$text = $(`<p></p>`);
-    this.$elem.append(this.$text);
-    this.$text.innerText(this.text);
+    this.$font = $(`
+        <i class='iconfont icon-play-circle' />
+    `);
+    this.$elem.append(this.$font);
     this.isPlay = false;
     this.type = 'click';
+
+    video.$playFont = this.$font;
+   
 };
 
 // 修改原型
@@ -28,19 +31,8 @@ PlayCon.prototype = {
 
     // 点击事件
     onClick:function(){
-        let {video, isPlay, text} = this;
-        const {$videoElm} = video;
-        if(isPlay){
-            text = '播放';
-            $videoElm.pause();
-            this.isPlay = false;
-        }else{
-            text = '暂停';
-            $videoElm.play();
-            this.isPlay = true;
-        };
-        this.$text.innerText(text);
-        video.isPlay = isPlay;
+        const {video} = this;
+        video.E.play();
     },
 };
 

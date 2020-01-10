@@ -10,6 +10,10 @@
      * 
      */
 
+    /**
+     * 
+     * @param {Element} html 
+     */
     function createElemByHTML(html) {
         var div = void 0;
         div = document.createElement('div');
@@ -38,6 +42,10 @@
 
     // 创建构造函数
 
+    /**
+     * 
+     * @param {Object} selector 
+     */
     function DomElement(selector) {
 
         if (!selector) return;
@@ -75,6 +83,10 @@
     }
     DomElement.prototype = {
 
+        /**
+         * 
+         * @param {function} fn 
+         */
         forEach: function forEach(fn) {
             for (var i = 0; i < this.length; i++) {
                 var elem = this[i];
@@ -84,7 +96,6 @@
                 }
             }        return this;
         },
-
         // 绑定事件
         on: function on(type, selector, fn) {
             if (!fn) {
@@ -102,7 +113,6 @@
                         elem.addEventListener(type, fn);
                         return;
                     }
-
                     elem.addEventListener(type, function (e) {
                         var target = e.target;
                         if (target.matches(selector)) {
@@ -120,6 +130,25 @@
                 return null;
             }        return $(elem.children);
         },
+
+        // 获取第几个元素
+        /**
+         * 
+         * @param {number} num 
+         * 获取第几个元素
+         */
+        get: function get(num) {
+            var length = this.length;
+            if (num >= length) {
+                num = num % length;
+            }        return $(this[num]);
+        },
+
+        /**
+         * 
+         * @param {string} className
+         * 需要添加的类名
+         */
 
         // 添加class
         addClass: function addClass(className) {
@@ -140,6 +169,72 @@
             });
         },
 
+        /**
+         * 
+         * @param {string} className 
+         * 移除类名
+         */
+
+        // 移除class
+        removeClass: function removeClass(className) {
+            if (!className) return this;
+            return this.forEach(function (elem) {
+                var arr = void 0,
+                    i = void 0;
+                arr = elem.className.split(/\s/);
+                for (i = 0; i < arr.length; i += 1) {
+                    var name = arr[i];
+                    if (name === className) {
+                        arr.splice(i, 1);
+                    }
+                }            elem.className = arr.join(' ');
+            });
+        },
+
+        /**
+         * 
+         * @param {string} key 
+         * @param {string} val
+         * 
+         * key 是需要修改样式名 val 是需要修改样式内容 
+         */
+        // 修改css
+        css: function css(key, val) {
+            var currentStyle = key + ':' + val;
+            return this.forEach(function (elem) {
+                var style = (elem.getAttribute('style') || '').trim();
+                var styleArr = void 0,
+                    resultArr = [];
+                if (style) {
+                    styleArr = style.split(';');
+                    styleArr.forEach(function (item) {
+                        var arr = item.split(':').map(function (i) {
+                            return i.trim();
+                        });
+                        if (arr.length === 2) {
+                            resultArr.push(arr[0] + ':' + arr[1]);
+                        }                });
+                    resultArr = resultArr.map(function (item) {
+                        if (item.indexOf(key) === 0) {
+                            return currentStyle;
+                        } else {
+                            return item;
+                        }
+                    });
+                    if (resultArr.indexOf(currentStyle) < 0) {
+                        resultArr.push(currentStyle);
+                    }                elem.setAttribute('style', resultArr.join('; '));
+                } else {
+                    elem.setAttribute('style', currentStyle);
+                }
+            });
+        },
+
+        /**
+         * 
+         * @param {object} $children 
+         * 需要添加的子节点
+         */
         // 添加子节点
         append: function append($children) {
             return this.forEach(function (elem) {
@@ -149,11 +244,27 @@
             });
         },
 
+        /**
+         * 
+         * @param {string} text 
+         *  需要渲染的文字
+         */
         innerText: function innerText(text) {
             return this.forEach(function (elem) {
                 if (!text) return;
                 elem.innerText = text;
             });
+        },
+
+        // 获取video对象
+        getVideoEvent: function getVideoEvent() {
+            var el = null;
+            this.forEach(function (elem) {
+                if (elem !== null) {
+                    el = elem;
+                }
+            });
+            return el;
         },
 
         // 视频播放
@@ -176,22 +287,127 @@
     }
 
     /**
+     * video - event
+     * 视频所有的操作事件
+     */
+
+    // 构造函数
+
+    /**
+     * 
+     * @param {Object} video 
+     * 视频对象 所要操作的对象
+     */
+
+    function Event(video) {
+        this.video = video;
+    }
+    Event.prototype = {
+        // 视频播放
+        play: function play() {
+            var _video = this.video,
+                $videoElm = _video.$videoElm,
+                isPlay = _video.isPlay,
+                $playFont = _video.$playFont;
+
+            if (isPlay) {
+                $videoElm.pause();
+                $playFont.removeClass('icon-timeout');
+                $playFont.addClass('icon-play-circle');
+                isPlay = false;
+            } else {
+                $playFont.removeClass('icon-play-circle');
+                $playFont.addClass('icon-timeout');
+                $videoElm.play();
+                isPlay = true;
+            }        video.isPlay = isPlay;
+        },
+
+        // 全屏
+        fullScreen: function fullScreen() {
+            var video = this.video;
+            var $selector = video.$selector,
+                isFull = video.isFull,
+                $fullFont = video.$fullFont;
+
+            this._requestFullScreen($selector.get(0)[0], isFull);
+            if (isFull) {
+                $fullFont.addClass('icon-fullscreen');
+                $fullFont.removeClass('icon-fullscreen-exit');
+                isFull = false;
+            } else {
+                $fullFont.addClass('icon-fullscreen-exit');
+                $fullFont.removeClass('icon-fullscreen');
+                isFull = true;
+            }
+            video.isFull = isFull;
+        },
+        _requestFullScreen: function _requestFullScreen(elemt, isFull) {
+            var requestMethod = elemt.requestFullScreen || //w3c
+            elemt.webkitRequestFullScreen || //firfox
+            elemt.mozRequestFullScreen || //chorme
+            elemt.msRequestFullScreen; //ie11
+            if (requestMethod) {
+                if (!isFull) {
+                    requestMethod.call(elemt);
+                } else {
+                    document.exitFullscreen();
+                }
+            }    }
+    };
+
+    function E(video) {
+        return new Event(video);
+    }
+
+    /**
      *  video 元素
      */
 
     function VideoDom(video) {
         this.video = video;
     }
+    /**
+     * @param {object} video 
+     *  video 对象
+     */
+
     VideoDom.prototype = {
         _init: function _init() {
+            var _this = this;
+
             var video = this.video;
             var $videoElm = video.$videoElm;
 
-            var videoEvent = $videoElm[0];
-            $videoElm.on('loadedmetadata', this._videoLoad);
+            this.$event = $videoElm.getVideoEvent();
+            $videoElm.on('loadedmetadata', function () {
+                var duration = _this.$event.duration;
+
+                var durationTime = _this._time2minute(duration);
+                video.$durationTime.innerText(durationTime);
+            });
+            $videoElm.on('play', function () {
+                _this.playTime = setInterval(function () {
+                    video.$playTime.innerText(_this._time2minute(_this.$event.currentTime));
+                }, 1000);
+            });
+            $videoElm.on('ended', function () {
+                console.log('end');
+            });
+
+            // 保存属性
+            video.playTime = this.playTime;
         },
 
-        _videoLoad: function _videoLoad() {}
+        _time2minute: function _time2minute(time) {
+            var second = parseInt(time % 60),
+                minute = parseInt(time / 60);
+            if (second < 10) {
+                second = '0' + second;
+            }
+            var durationTime = minute + ':' + second;
+            return durationTime;
+        }
 
     };
 
@@ -203,13 +419,13 @@
     //  构造函数
     function PlayCon(video) {
         this.video = video;
-        this.text = '播放';
         this.$elem = $('\n        <div class=\'l-c-playCon\'>\n\n        </div>\n    ');
-        this.$text = $('<p></p>');
-        this.$elem.append(this.$text);
-        this.$text.innerText(this.text);
+        this.$font = $('\n        <i class=\'iconfont icon-play-circle\' />\n    ');
+        this.$elem.append(this.$font);
         this.isPlay = false;
         this.type = 'click';
+
+        video.$playFont = this.$font;
     }
     // 修改原型
     PlayCon.prototype = {
@@ -218,22 +434,150 @@
 
         // 点击事件
         onClick: function onClick() {
-            var video = this.video,
-                isPlay = this.isPlay,
-                text = this.text;
-            var $videoElm = video.$videoElm;
+            var video = this.video;
 
-            if (isPlay) {
-                text = '播放';
-                $videoElm.pause();
-                this.isPlay = false;
-            } else {
-                text = '暂停';
-                $videoElm.play();
-                this.isPlay = true;
-            }        this.$text.innerText(text);
-            video.isPlay = isPlay;
+            video.E.play();
         }
+    };
+
+    /**
+     * controls - voice
+     * 声音调节
+     */
+
+    // 构造函数
+    /**
+     * 
+     * @param {object} video 
+     * video对象
+     */
+    function Voice(video) {
+        this.video = video;
+        this.$elem = $('\n        <div class=\'l-c-video\'>\n            <i class=\'iconfont icon-sound\' />\n        </div>\n    ');
+    }
+    Voice.prototype = {
+        constructor: Voice
+    };
+
+    /**
+     * controls - timeText 
+     * 视频时间显示
+     */
+
+    // 构造函数
+    /**
+     * 
+     * @param {Object} video 
+     * video 对象
+     */
+    function TimeText(video) {
+        this.video = video;
+        this.$durationTime = $('\n        <p> 0:00 </p>\n    ');
+        this.$playTime = $('\n        <p> 0:00 </p>\n    ');
+        this.$line = $('<p> / </p>');
+        this.$elem = $('\n        <div class=\'l-c-timeText\'></div>\n    ');
+        this.$elem.append(this.$playTime).append(this.$line).append(this.$durationTime);
+
+        video.$durationTime = this.$durationTime;
+        video.$playTime = this.$playTime;
+    }
+    TimeText.prototype = {
+        constructor: TimeText
+    };
+
+    /**
+     * controls - loop
+     * 循环播放
+     */
+
+    // 构造函数
+    /**
+     * 
+     * @param {Object} video 
+     * video 对象
+     */
+    function Loop(video) {
+        this.video = video;
+        this.$elem = $('\n        <div class=\'l-c-loop\'>\n            <i class=\'iconfont icon-repeat\' />\n        </div>\n    ');
+    }
+    // 修改原型
+    Loop.prototype = {
+        constructor: Loop
+    };
+
+    /**
+     * controls - speed
+     * 播放速度
+     */
+
+    // 构造函数
+    /**
+     * 
+     * @param {Object} video 
+     * video 对象
+     */
+    function Speed(video) {
+        this.video = video;
+        this.$elem = $('\n        <div class=\'l-c-speed\'> x1 </div> \n    ');
+    }
+    // 修改原型
+    Speed.prototype = {
+        constructor: Speed
+    };
+
+    /**
+     * controls - fullScreen
+     * 视频全屏
+     */
+
+    // 构造函数
+    /**
+     * 
+     * @param {Object} video 
+     * video 对象
+     */
+    function FullScreen(video) {
+        this.video = video;
+        this.$elem = $('\n        <div class=\'l-g-fullScreen\'>\n        </div>\n    ');
+        this.$font = $('\n        <i class=\'iconfont icon-fullscreen\' />\n    ');
+        this.$elem.append(this.$font);
+        this.isFull = false;
+        this.type = 'click';
+
+        video.$fullFont = this.$font;
+    }
+
+    // 修改原型
+    FullScreen.prototype = {
+        constructor: FullScreen,
+
+        // 点击事件
+        onClick: function onClick() {
+            var _video = video,
+                E = _video.E;
+
+            E.fullScreen();
+        }
+    };
+
+    /**
+     * controls - progressBar
+     * 进度条
+     */
+
+    // 构造函数
+    /**
+     * 
+     * @param {Object} video 
+     * video 对象
+     */
+    function ProgressBar(video) {
+        this.video = video;
+        this.$elem = $('\n        <div class=\'l-c-progressBar\'></div>\n    ');
+    }
+    // 修改原型
+    ProgressBar.prototype = {
+        constructor: ProgressBar
     };
 
     /**
@@ -243,6 +587,12 @@
     // 存储控制器的构造函数
     var ControlsConstructors = {};
     ControlsConstructors.playCon = PlayCon;
+    ControlsConstructors.voice = Voice;
+    ControlsConstructors.timeText = TimeText;
+    ControlsConstructors.loop = Loop;
+    ControlsConstructors.speed = Speed;
+    ControlsConstructors.fullScreen = FullScreen;
+    ControlsConstructors.progressBar = ProgressBar;
 
     /**
      * 公共库
@@ -305,10 +655,19 @@
             var video = this.video;
             var $videoControls = video.$controlsBar;
             var controls = this.controls;
+            var $controlsMain = $('<div></div>');
+            var $controlsProgress = $('<div></div>');
+            $videoControls.append($controlsProgress);
+            $videoControls.append($controlsMain);
+            $controlsProgress.addClass('l-c-controlsProgress');
+            $controlsMain.addClass('l-c-controlsMain');
             objForEach(controls, function (key, control) {
                 var $elem = control.$elem;
                 if ($elem) {
-                    $videoControls.append($elem);
+                    $controlsProgress.append($elem);
+                }
+                if (key === 'progressBar') ; else {
+                    $controlsMain.append($elem);
                 }
             });
         },
@@ -338,17 +697,18 @@
      */
 
     var config = {
-
+        width: null,
+        height: null,
         // 默认控制器配置
         controls: ['progressBar', //进度条
         'playCon', //播放暂停按钮
         'voice', // 声音控制
         // 'setting', //设置
-        'speed', //播放速度设置
         // 'playMode', //播放方式
-        'fullScreen', //全屏
+        'timeText', //时间显示
         'loop', //循环
-        'timeText'],
+        'speed', //播放速度设置
+        'fullScreen'],
         url: null,
         title: null
     };
@@ -368,22 +728,54 @@
         }
         // 每创建一个新的video id累加 用来判断单个页面不同的video对象
         this.id = 'liangeVideo-' + videoId++;
+        this.E = E(this);
 
         this.selector = selector;
         this.config = config;
+        this.$selector = $(selector);
     }
     Video.prototype = {
 
         // 初始化配置
         _initConfig: function _initConfig() {
             var target = {};
+            var $selector = this.$selector;
             this.config = Object.assign(target, config, this.config);
+            var _config2 = this.config,
+                width = _config2.width,
+                height = _config2.height;
+
+            // 设置播放器的宽度
+
+            if (width !== null) {
+                //如果用户配置了宽度
+                if (width <= 350) {
+                    // 播放器的最小宽度是350
+                    width = 350;
+                }
+            } else {
+                // 如果用户没有配置宽度 则默认为700
+                width = 700;
+            }        // 设置播放器的高度
+            if (height !== null) {
+                if (height <= 200) {
+                    // 如果用户配置了高度
+                    // 播放器的最小高度为200
+                    height = 200;
+                }
+            } else {
+                // 如果用户没有配置高度 则默认为200
+                height = 480;
+            }
+            // 将配置配置到播放器上
+            $selector.css('width', width + 'px').css('height', height + 'px');
         },
 
         // 初始化DOM
         _initDom: function _initDom() {
-            var selector = this.selector;
-            var $selectore = $(selector);
+            var _this = this;
+
+            var $selector = this.$selector;
             var config = this.config;
 
             var $controlsBar = void 0,
@@ -396,13 +788,13 @@
             // 如果需要标题 则创建标题
             if (config.title !== null) {
                 $titleElm = $('<div>\n                <p>' + config.title + '</p>\n            </div>');
-                $selectore.append($titleElm);
+                $selector.append($titleElm);
                 $titleElm.addClass('l-title');
                 this.$titleElm = $titleElm;
             }
 
             // 将控制器和播放器添加到dom上
-            $selectore.append($controlsBar).append($videoElm);
+            $selector.append($controlsBar).append($videoElm);
 
             // 添加class
             $controlsBar.addClass('l-c-controlsBar');
@@ -411,6 +803,22 @@
             // 保存属性
             this.$controlsBar = $controlsBar;
             this.$videoElm = $videoElm;
+            this.$selector = $selector;
+
+            // 绑定事件
+            $videoElm.on('click', function () {
+                _this.E.play();
+            });
+            $videoElm.on('dblclick', function () {
+                _this.E.fullScreen();
+            });
+            window.addEventListener('keydown', function (e) {
+                var keyCode = e.keyCode;
+
+                if (keyCode === 32) {
+                    _this.E.play();
+                }
+            });
         },
 
         // 初始化video
@@ -443,12 +851,6 @@
     } catch (error) {
         throw new Error('请在浏览器环境下运行');
     }
-    var inlineCss = '*{    margin: 0;    padding: 0;    color: #000;}.video{    width: 700px;    height: 480px;    display: -webkit-box;    display: flex;    align-content: center;    -webkit-box-pack: center;            justify-content: center;    position: relative;    margin: 10px auto;}.l-video{    width: 100%;    height: 100%;    background-color: #000;}.video .l-title{    width: 100%;    box-sizing: border-box;    padding: 20px 20px;    position: absolute;    top: 0;    left: 0;    background:-webkit-gradient(linear, left top, left bottom, from(rgba(43,51,63,.7)), to(rgba(0,0,0,0.3)));    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=\'#4c000000\', endColorstr=\'#4c000000\');    background:linear-gradient(to bottom, rgba(43,51,63,.7), rgba(0,0,0,0.3));    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=\'#4c000000\', endColorstr=\'#4c000000\');    z-index: 9;}:root .video .l-title{    filter: none\\9;}:root .video .l-title{    filter: none\\9;}.video .l-title p{    font-size: 16px;    font-weight: 500;    color: #fff;    overflow: hidden;    white-space: nowrap;    text-overflow: ellipsis;}.video .l-c-controlsBar{    width: 100%;    padding: 20px 10px;    box-sizing: border-box;    background:-webkit-gradient(linear, left bottom, left top, from(rgba(43,51,63,.7)), to(rgba(0,0,0,0.3)));    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=\'#4c000000\', endColorstr=\'#4c000000\');    background:linear-gradient(to top, rgba(43,51,63,.7), rgba(0,0,0,0.3));    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=\'#4c000000\', endColorstr=\'#4c000000\');    position: absolute;    bottom: 0;    left: 0;    z-index: 9;}:root .video .l-c-controlsBar{    filter: none\\9;}:root .video .l-c-controlsBar{    filter: none\\9;}.video .l-c-controlsBar .l-c-playCon{    width: 40px;    height: 40px;    line-height: 40px;    text-align: center;    background:#fff;    border-radius: 100%;    cursor: pointer;    -webkit-user-select: none;       -moz-user-select: none;        -ms-user-select: none;            user-select: none;}.video .l-c-controlsBar .l-c-playCon p{    color: #000;    font-size: 12px;}',
-        style = document.createElement('style');
-    style.type = 'text/css';
-    style.innerHTML = inlineCss;
-    document.getElementsByTagName('HEAD').item(0).appendChild(style);
-
     var index = window.liangeVideoJs || Video;
 
     return index;

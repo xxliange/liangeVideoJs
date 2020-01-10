@@ -14,6 +14,11 @@ const gulp = require('gulp'),
     resolve = require('rollup-plugin-node-resolve'),
     babel = require('rollup-plugin-babel');
 
+gulp.task('copy-fonts', async()=>{
+    gulp.src('./src/css/icon/*')
+        .pipe(gulp.dest('./build/fonts'))
+})
+
 gulp.task('css', async()=>{
     gulp.src('./src/css/**/*.css')
     .pipe(concat('liangeVideoJs.css'))
@@ -61,7 +66,7 @@ gulp.task('script', async()=>{
     })
 });
 
-gulp.task('default', gulp.parallel(['script', 'css'], ()=>{
+gulp.task('default', gulp.parallel(['script', 'css', 'copy-fonts'], ()=>{
     gulp.watch('./src/js/**/*.js', gulp.series('script'));
     gulp.watch('./src/css/**/*.css', gulp.parallel('css', 'script'));
 }));

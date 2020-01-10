@@ -4,7 +4,7 @@
     color: #000;
 }
 .video{
-    width: 700px;
+    width: 900px;
     height: 480px;
     display: flex;
     align-content: center;
@@ -20,7 +20,8 @@
 .video .l-title{
     width: 100%;
     box-sizing: border-box;
-    padding: 20px 20px;
+    letter-spacing: 1px;
+    padding: 10px 20px;
     position: absolute;
     top: 0;
     left: 0;
@@ -38,25 +39,90 @@
 }
 .video .l-c-controlsBar{
     width: 100%;
-    padding: 20px 10px;
+    padding: 10px 10px 5px 10px;
     box-sizing: border-box;
     background:linear-gradient(to top, rgba(43,51,63,.7), rgba(0,0,0,0.3));
     position: absolute;
     bottom: 0;
     left: 0;
     z-index: 9;
+    
 }
-.video .l-c-controlsBar .l-c-playCon{
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-    background:#fff;
+.video .l-c-controlsBar .l-c-controlsProgress{
+    width: 100%;
+    user-select: none;
+    position: relative;
+    margin-bottom: 5px;
+}
+.video .l-c-controlsBar .l-c-controlsProgress .l-c-progressBar{
+    width: 100%;
+    position: relative;
+    padding: 2px 0;
+    background-color: rgba(115, 133, 159, 0.5);
+    border-radius: 40px;
+}
+.video .l-c-controlsBar .l-c-controlsMain{
+    display: flex;
+    align-items: center;
+    user-select: none;
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+}
+.video .l-c-controlsBar .l-c-controlsMain .l-c-playCon{
     border-radius: 100%;
     cursor: pointer;
-    user-select: none;
+    padding: 4px 10px;
 }
-.video .l-c-controlsBar .l-c-playCon p{
+.video .l-c-controlsBar .l-c-controlsMain  .iconfont{
+    color: #fff;
+    font-size:20px ;
+}
+.video .l-c-controlsBar .l-c-controlsMain .l-c-playCon p{
     color: #000;
     font-size: 12px;
+}
+
+.video .l-c-controlsBar .l-c-controlsMain .l-c-video{
+    padding: 4px 10px;
+}
+
+.video .l-c-controlsBar .l-c-controlsMain .l-c-timeText{
+    display: flex;
+    align-items: center;
+    padding: 4px 10px;
+    color: #fff;
+}
+.video .l-c-controlsBar .l-c-controlsMain .l-c-timeText p{
+    color: #fff;
+}
+.video .l-c-controlsBar .l-c-controlsMain .l-c-timeText p:nth-child(2){
+    padding: 0 5px;
+}
+
+.video .l-c-controlsBar .l-c-controlsMain .l-c-loop{
+    display: flex;
+    align-items: center;
+    padding: 4px 10px;
+    position: absolute;
+    right: 100px;
+}
+.video .l-c-controlsBar .l-c-controlsMain .l-c-loop .iconfont{
+    font-size: 16px;
+}
+
+.video .l-c-controlsBar .l-c-controlsMain .l-c-speed{
+    padding: 4px 10px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 50px;
+}
+
+.video .l-c-controlsBar .l-c-controlsMain .l-g-fullScreen{
+    padding: 4px 10px;
+    position: absolute;
+    right: 0;
+    cursor: pointer;
 }

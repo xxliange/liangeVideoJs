@@ -4,6 +4,10 @@
  * 
  */
 
+/**
+ * 
+ * @param {Element} html 
+ */
 function createElemByHTML(html){
     let div;
     div = document.createElement('div');
@@ -35,6 +39,10 @@ const eventList = [];
 
 // 创建构造函数
 
+/**
+ * 
+ * @param {Object} selector 
+ */
 function DomElement(selector){
 
     if(!selector) return;
@@ -77,6 +85,10 @@ function DomElement(selector){
 
 DomElement.prototype = {
 
+    /**
+     * 
+     * @param {function} fn 
+     */
     forEach:function(fn){
         for(let i = 0; i<this.length;i++){
             const elem = this[i];
@@ -87,7 +99,6 @@ DomElement.prototype = {
         };
         return this;
     },
-
     // 绑定事件
     on:function(type, selector, fn){
         if(!fn){
@@ -113,7 +124,6 @@ DomElement.prototype = {
                     elem.addEventListener(type, fn);
                     return;
                 }
-
                 elem.addEventListener(type, e =>{
                     const target = e.target;
                     if(target.matches(selector)){
@@ -132,6 +142,26 @@ DomElement.prototype = {
         };
         return $(elem.children)
     },
+
+    // 获取第几个元素
+    /**
+     * 
+     * @param {number} num 
+     * 获取第几个元素
+     */
+    get:function(num){
+        const length = this.length;
+        if(num >= length){
+            num = num % length;
+        };
+        return $(this[num]);
+    },
+
+    /**
+     * 
+     * @param {string} className
+     * 需要添加的类名
+     */
 
     // 添加class
     addClass:function(className){
@@ -153,6 +183,73 @@ DomElement.prototype = {
         })
     },
 
+    /**
+     * 
+     * @param {string} className 
+     * 移除类名
+     */
+
+    // 移除class
+    removeClass:function(className){
+        if(!className) return this;
+        return this.forEach(elem=>{
+            let arr, i;
+            arr = elem.className.split(/\s/);
+            for (i=0;i<arr.length;i+=1){
+                const name = arr[i];
+                if(name === className){
+                    arr.splice(i,1);
+                }
+            };
+            elem.className = arr.join(' ');
+        })
+    },
+
+    /**
+     * 
+     * @param {string} key 
+     * @param {string} val
+     * 
+     * key 是需要修改样式名 val 是需要修改样式内容 
+     */
+    // 修改css
+    css:function(key, val){
+        const currentStyle = `${key}:${val}`;
+        return this.forEach(elem=>{
+            const style = (elem.getAttribute('style') || '').trim();
+            let styleArr, resultArr = [];
+            if(style){
+                styleArr = style.split(';');
+                styleArr.forEach(item =>{
+                    let arr = item.split(':').map(i=>{
+                        return i.trim();
+                    });
+                    if(arr.length === 2){
+                        resultArr.push(`${arr[0]}:${arr[1]}`);
+                    };
+                });
+                resultArr = resultArr.map(item =>{
+                    if(item.indexOf(key) === 0){
+                        return currentStyle;
+                    }else{
+                        return item;
+                    }
+                });
+                if(resultArr.indexOf(currentStyle) < 0){
+                    resultArr.push(currentStyle);
+                };
+                elem.setAttribute('style', resultArr.join('; '));
+            }else{
+                elem.setAttribute('style', currentStyle);
+            }
+        })
+    },
+
+    /**
+     * 
+     * @param {object} $children 
+     * 需要添加的子节点
+     */
     // 添加子节点
     append:function($children){
         return this.forEach(elem =>{
@@ -162,11 +259,27 @@ DomElement.prototype = {
         })
     },
 
+    /**
+     * 
+     * @param {string} text 
+     *  需要渲染的文字
+     */
     innerText:function(text){
         return this.forEach(elem=>{
             if(!text) return;
             elem.innerText = text;
         })
+    },
+
+    // 获取video对象
+    getVideoEvent:function(){
+        let el = null;
+        this.forEach(elem=>{
+            if(elem !== null){
+                el = elem;
+            }
+        });
+        return el;
     },
 
     // 视频播放
